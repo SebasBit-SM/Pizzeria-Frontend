@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div id="app">
     <!-- Menú de navegación -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -39,6 +40,14 @@
       <router-view></router-view>
     </div>
   </div>
+=======
+  <nav>
+    <router-link to="/">Home</router-link> |
+    <router-link to="/about">About</router-link> |
+    <router-link to="/pedidos">Gestion de Pedidos</router-link> |
+  </nav>
+  <router-view/>
+>>>>>>> d7c6b34255f956f03c56d358492eb58da03a07b2
 </template>
 
 <script>
