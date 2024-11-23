@@ -1,23 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import store from '../store'; 
 
-import Home from '../views/Home.vue';
+import HomeView from '../views/HomeView.vue';
 import Usuarios from '../views/Usuarios.vue';
 import Pedidos from '../views/Pedidos.vue';
 import Inventario from '../views/Inventario.vue';
 import Sucursales from '../views/Sucursales.vue';
 import Proveedores from '../views/Proveedores.vue';
 import Login from '../views/Login.vue'; 
+import Register from '../views/Register.vue'; 
 
-// Definir las rutas
 const routes = [
-  { path: '/', name: 'Home', component: Home },
+  { path: '/', name: 'Home', component: HomeView },  
   { path: '/login', name: 'Login', component: Login }, 
+  { path: '/register', name: 'Register', component: Register }, 
   {
     path: '/usuarios',
     name: 'Usuarios',
     component: Usuarios,
-    meta: { requiresAuth: true }, 
+    meta: { requiresAuth: true },
   },
   {
     path: '/pedidos',
@@ -45,18 +45,18 @@ const routes = [
   },
 ];
 
-// Crear el router
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
-// Middleware de protección de rutas
+// Middleware de autenticación
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !store.state.usuarioAutenticado) {
+  const usuarioAutenticado = localStorage.getItem('usuarioAutenticado'); 
+  if (to.meta.requiresAuth && !usuarioAutenticado) {
     next('/login');
   } else {
-    next(); 
+    next();
   }
 });
 
