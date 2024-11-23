@@ -23,3 +23,30 @@
       </table>
     </div>
   </template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      pedidos: [] // Lista para almacenar los pedidos
+    };
+  },
+  filters: {
+    formatoMoneda(value) {
+      return `$${parseFloat(value).toFixed(2)}`;
+    }
+  },
+  mounted() {
+    // Realiza la petición a la API para obtener los pedidos
+    axios.get('http://localhost:8000/api/pedidos')
+      .then(response => {
+        this.pedidos = response.data; // Guarda los datos obtenidos
+      })
+      .catch(error => {
+        console.error('Error al cargar los pedidos:', error);
+      });
+  }
+};
+</script>
