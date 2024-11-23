@@ -1,7 +1,6 @@
 <template>
   <div id="app">
-    <!-- Menú de navegación -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">Pizzería</a>
         <button
@@ -21,6 +20,9 @@
               <router-link to="/" class="nav-link">Inicio</router-link>
             </li>
             <li class="nav-item">
+              <router-link to="/usuarios" class="nav-link">Usuarios</router-link>
+            </li>
+            <li class="nav-item">
               <router-link to="/pedidos" class="nav-link">Pedidos</router-link>
             </li>
             <li class="nav-item">
@@ -29,15 +31,14 @@
             <li class="nav-item">
               <router-link to="/sucursales" class="nav-link">Sucursales</router-link>
             </li>
+            <li class="nav-item">
+              <router-link to="/proveedores" class="nav-link">Proveedores</router-link>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
-
-    <!-- Vista dinámica -->
-    <div class="container mt-4">
-      <router-view></router-view>
-    </div>
+    <router-view />
   </div>
 </template>
 
@@ -48,15 +49,7 @@ export default {
 </script>
 
 <style>
-/* Estilos generales */
 body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
   background-color: #f8f9fa;
-}
-
-.navbar {
-  margin-bottom: 20px;
 }
 </style>
