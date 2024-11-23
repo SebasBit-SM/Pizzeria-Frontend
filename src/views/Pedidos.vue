@@ -1,16 +1,13 @@
 <template>
-  <div class="container">
-    <h1 class="my-4">Gestión de Pedidos</h1>
-
-    <!-- Botón para abrir el modal de creación -->
+  <div class="container mt-4">
+    <h1>Gestión de Pedidos</h1>
     <button class="btn btn-primary mb-3" @click="abrirModal('crear')">Nuevo Pedido</button>
-
-    <!-- Tabla de pedidos -->
     <table class="table table-hover">
       <thead class="table-primary">
         <tr>
           <th>#</th>
           <th>Cliente</th>
+          <th>Sucursal</th>
           <th>Estado</th>
           <th>Total</th>
           <th>Acciones</th>
@@ -20,6 +17,7 @@
         <tr v-for="pedido in pedidos" :key="pedido.id">
           <td>{{ pedido.id }}</td>
           <td>{{ pedido.cliente }}</td>
+          <td>{{ pedido.sucursal }}</td>
           <td>{{ pedido.estado }}</td>
           <td>{{ pedido.total | formatoMoneda }}</td>
           <td>
@@ -30,7 +28,7 @@
       </tbody>
     </table>
 
-    <!-- Modal de creación y edición de pedidos -->
+    <!-- Modal de creación/edición -->
     <div class="modal" tabindex="-1" ref="modal">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -45,8 +43,17 @@
                 <input type="text" id="cliente" v-model="form.cliente" class="form-control" required />
               </div>
               <div class="mb-3">
+                <label for="sucursal" class="form-label">Sucursal</label>
+                <input type="text" id="sucursal" v-model="form.sucursal" class="form-control" required />
+              </div>
+              <div class="mb-3">
                 <label for="estado" class="form-label">Estado</label>
-                <input type="text" id="estado" v-model="form.estado" class="form-control" required />
+                <select id="estado" v-model="form.estado" class="form-control" required>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="en_preparacion">En Preparación</option>
+                  <option value="listo">Listo</option>
+                  <option value="entregado">Entregado</option>
+                </select>
               </div>
               <div class="mb-3">
                 <label for="total" class="form-label">Total</label>
@@ -67,11 +74,12 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      pedidos: [], // Lista de pedidos
-      modo: 'crear', // Modo de operación: crear o editar
+      pedidos: [],
+      modo: 'crear',
       form: {
         id: null,
         cliente: '',
+        sucursal: '',
         estado: '',
         total: 0,
       },
@@ -87,15 +95,15 @@ export default {
           this.pedidos = response.data;
         })
         .catch(error => {
-          console.error('Error al cargar los pedidos:', error);
+          console.error('Error al cargar pedidos:', error);
         });
     },
     abrirModal(modo, pedido = null) {
       this.modo = modo;
       if (modo === 'editar' && pedido) {
-        this.form = { ...pedido }; // Rellenar formulario con los datos del pedido
+        this.form = { ...pedido };
       } else {
-        this.form = { id: null, cliente: '', estado: '', total: 0 }; // Limpiar formulario
+        this.form = { id: null, cliente: '', sucursal: '', estado: '', total: 0 };
       }
       this.$refs.modal.style.display = 'block';
     },
@@ -104,35 +112,33 @@ export default {
     },
     guardarPedido() {
       if (this.modo === 'crear') {
-        // Crear nuevo pedido
         axios.post('http://localhost:8000/api/pedidos', this.form)
           .then(() => {
             this.cargarPedidos();
             this.cerrarModal();
           })
           .catch(error => {
-            console.error('Error al crear el pedido:', error);
+            console.error('Error al guardar pedido:', error);
           });
       } else {
-        // Editar pedido
         axios.put(`http://localhost:8000/api/pedidos/${this.form.id}`, this.form)
           .then(() => {
             this.cargarPedidos();
             this.cerrarModal();
           })
           .catch(error => {
-            console.error('Error al editar el pedido:', error);
+            console.error('Error al editar pedido:', error);
           });
       }
     },
     eliminarPedido(id) {
-      if (confirm('¿Estás seguro de que deseas eliminar este pedido?')) {
+      if (confirm('¿Estás seguro de eliminar este pedido?')) {
         axios.delete(`http://localhost:8000/api/pedidos/${id}`)
           .then(() => {
             this.cargarPedidos();
           })
           .catch(error => {
-            console.error('Error al eliminar el pedido:', error);
+            console.error('Error al eliminar pedido:', error);
           });
       }
     },
@@ -146,7 +152,6 @@ export default {
 </script>
 
 <style>
-/* Estilo del modal */
 .modal {
   display: none;
   position: fixed;
