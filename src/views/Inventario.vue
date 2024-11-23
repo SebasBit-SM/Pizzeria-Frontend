@@ -21,3 +21,33 @@
       </table>
     </div>
   </template>
+  
+  <script>
+  import axios from 'axios';
+  
+  export default {
+    data() {
+      return {
+        materiales: [] // Lista para almacenar los materiales del inventario
+      };
+    },
+    mounted() {
+      // Petición al API para cargar los materiales
+      axios.get('http://localhost:8000/api/inventario')
+        .then(response => {
+          this.materiales = response.data; // Guarda los datos en la lista
+        })
+        .catch(error => {
+          console.error('Error al cargar el inventario:', error);
+        });
+    }
+  };
+  </script>
+  
+  <style>
+  /* Opcional: estilo para la tabla */
+  .table-bordered {
+    margin-top: 20px;
+  }
+  </style>
+  
