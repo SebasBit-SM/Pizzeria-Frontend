@@ -1,11 +1,7 @@
 <template>
-  <div class="container">
-    <h1 class="my-4">Gestión de Inventario</h1>
-
-    <!-- Botón para abrir el modal de creación -->
+  <div class="container mt-4">
+    <h1>Gestión de Inventario</h1>
     <button class="btn btn-primary mb-3" @click="abrirModal('crear')">Nuevo Material</button>
-
-    <!-- Tabla de inventario -->
     <table class="table table-hover">
       <thead class="table-primary">
         <tr>
@@ -30,7 +26,7 @@
       </tbody>
     </table>
 
-    <!-- Modal de creación y edición de materiales -->
+    <!-- Modal de creación/edición -->
     <div class="modal" tabindex="-1" ref="modal">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -110,7 +106,7 @@ export default {
             this.cerrarModal();
           })
           .catch(error => {
-            console.error('Error al crear material:', error);
+            console.error('Error al guardar el material:', error);
           });
       } else {
         axios.put(`http://localhost:8000/api/inventario/${this.form.id}`, this.form)
@@ -119,18 +115,18 @@ export default {
             this.cerrarModal();
           })
           .catch(error => {
-            console.error('Error al editar material:', error);
+            console.error('Error al editar el material:', error);
           });
       }
     },
     eliminarMaterial(id) {
-      if (confirm('¿Estás seguro de que deseas eliminar este material?')) {
+      if (confirm('¿Estás seguro de eliminar este material?')) {
         axios.delete(`http://localhost:8000/api/inventario/${id}`)
           .then(() => {
             this.cargarMateriales();
           })
           .catch(error => {
-            console.error('Error al eliminar material:', error);
+            console.error('Error al eliminar el material:', error);
           });
       }
     },
@@ -139,7 +135,6 @@ export default {
 </script>
 
 <style>
-/* Estilo del modal */
 .modal {
   display: none;
   position: fixed;
