@@ -1,30 +1,32 @@
 <template>
   <div class="container mt-4">
-    <h1>Gestión de Inventario</h1>
+    <h1 class="text-center mb-4">Gestión de Inventario</h1>
     <button class="btn btn-primary mb-3" @click="abrirModal('crear')">Nuevo Material</button>
-    <table class="table table-hover">
-      <thead class="table-primary">
-        <tr>
-          <th>#</th>
-          <th>Material</th>
-          <th>Unidad</th>
-          <th>Stock Actual</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="material in materiales" :key="material.id">
-          <td>{{ material.id }}</td>
-          <td>{{ material.nombre }}</td>
-          <td>{{ material.unidad }}</td>
-          <td>{{ material.stock_actual }}</td>
-          <td>
-            <button class="btn btn-warning btn-sm me-2" @click="abrirModal('editar', material)">Editar</button>
-            <button class="btn btn-danger btn-sm" @click="eliminarMaterial(material.id)">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Material</th>
+            <th>Unidad</th>
+            <th>Stock Actual</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="material in materiales" :key="material.id">
+            <td>{{ material.id }}</td>
+            <td>{{ material.nombre }}</td>
+            <td>{{ material.unidad }}</td>
+            <td>{{ material.stock_actual }}</td>
+            <td>
+              <button class="btn btn-warning btn-sm me-2" @click="abrirModal('editar', material)">Editar</button>
+              <button class="btn btn-danger btn-sm" @click="eliminarMaterial(material.id)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Modal de creación/edición -->
     <div class="modal" tabindex="-1" ref="modal">
@@ -48,7 +50,7 @@
                 <label for="stock_actual" class="form-label">Stock Actual</label>
                 <input type="number" id="stock_actual" v-model="form.stock_actual" class="form-control" required />
               </div>
-              <button type="submit" class="btn btn-success">Guardar</button>
+              <button type="submit" class="btn btn-success w-100">Guardar</button>
             </form>
           </div>
         </div>
