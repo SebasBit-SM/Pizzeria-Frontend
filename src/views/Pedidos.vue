@@ -1,9 +1,19 @@
 <template>
-  <div class="container mt-4">
-    <h1>Gestión de Pedidos</h1>
-    <button class="btn btn-primary mb-3" @click="abrirModal('crear')">Nuevo Pedido</button>
-    <table class="table table-hover">
-      <thead class="table-primary">
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Gestión de Pedidos</h1>
+    <div class="d-flex justify-content-between mb-3">
+      <button class="btn btn-primary" @click="abrirModal('crear')">
+        <i class="bi bi-plus-circle"></i> Nuevo Pedido
+      </button>
+      <input
+        type="text"
+        class="form-control w-50"
+        placeholder="Buscar pedido..."
+        v-model="searchQuery"
+      />
+    </div>
+    <table class="table table-bordered table-striped table-hover">
+      <thead class="table-dark text-center">
         <tr>
           <th>#</th>
           <th>Cliente</th>
@@ -14,41 +24,94 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="pedido in pedidos" :key="pedido.id">
+        <tr v-for="pedido in pedidosFiltrados" :key="pedido.id">
           <td>{{ pedido.id }}</td>
           <td>{{ pedido.cliente }}</td>
           <td>{{ pedido.sucursal }}</td>
-          <td>{{ pedido.estado }}</td>
-          <td>{{ pedido.total | formatoMoneda }}</td>
           <td>
-            <button class="btn btn-warning btn-sm me-2" @click="abrirModal('editar', pedido)">Editar</button>
-            <button class="btn btn-danger btn-sm" @click="eliminarPedido(pedido.id)">Eliminar</button>
+            <span
+              class="badge"
+              :class="{
+                'bg-warning text-dark': pedido.estado === 'pendiente',
+                'bg-info': pedido.estado === 'en_preparacion',
+                'bg-success': pedido.estado === 'listo',
+                'bg-primary': pedido.estado === 'entregado',
+              }"
+            >
+              {{ pedido.estado }}
+            </span>
+          </td>
+          <td>{{ pedido.total | formatoMoneda }}</td>
+          <td class="text-center">
+            <button
+              class="btn btn-warning btn-sm me-2"
+              @click="abrirModal('editar', pedido)"
+            >
+              <i class="bi bi-pencil-square"></i> Editar
+            </button>
+            <button
+              class="btn btn-danger btn-sm"
+              @click="eliminarPedido(pedido.id)"
+            >
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
 
     <!-- Modal de creación/edición -->
-    <div class="modal" tabindex="-1" ref="modal">
+    <div
+      class="modal fade"
+      id="pedidoModal"
+      tabindex="-1"
+      aria-labelledby="pedidoModalLabel"
+      aria-hidden="true"
+      ref="modal"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ modo === 'crear' ? 'Crear Pedido' : 'Editar Pedido' }}</h5>
-            <button type="button" class="btn-close" @click="cerrarModal"></button>
+            <h5 class="modal-title" id="pedidoModalLabel">
+              {{ modo === 'crear' ? 'Crear Pedido' : 'Editar Pedido' }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="cerrarModal"
+              aria-label="Close"
+            ></button>
           </div>
           <div class="modal-body">
             <form @submit.prevent="guardarPedido">
               <div class="mb-3">
                 <label for="cliente" class="form-label">Cliente</label>
-                <input type="text" id="cliente" v-model="form.cliente" class="form-control" required />
+                <input
+                  type="text"
+                  id="cliente"
+                  v-model="form.cliente"
+                  class="form-control"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label for="sucursal" class="form-label">Sucursal</label>
-                <input type="text" id="sucursal" v-model="form.sucursal" class="form-control" required />
+                <input
+                  type="text"
+                  id="sucursal"
+                  v-model="form.sucursal"
+                  class="form-control"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label for="estado" class="form-label">Estado</label>
-                <select id="estado" v-model="form.estado" class="form-control" required>
+                <select
+                  id="estado"
+                  v-model="form.estado"
+                  class="form-select"
+                  required
+                >
                   <option value="pendiente">Pendiente</option>
                   <option value="en_preparacion">En Preparación</option>
                   <option value="listo">Listo</option>
@@ -57,9 +120,26 @@
               </div>
               <div class="mb-3">
                 <label for="total" class="form-label">Total</label>
-                <input type="number" id="total" v-model="form.total" class="form-control" required />
+                <input
+                  type="number"
+                  id="total"
+                  v-model="form.total"
+                  class="form-control"
+                  required
+                />
               </div>
-              <button type="submit" class="btn btn-success">Guardar</button>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  @click="cerrarModal"
+                >
+                  Cancelar
+                </button>
+                <button type="submit" class="btn btn-success">
+                  <i class="bi bi-save"></i> Guardar
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -69,76 +149,97 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   data() {
     return {
       pedidos: [],
-      modo: 'crear',
+      modo: "crear",
       form: {
         id: null,
-        cliente: '',
-        sucursal: '',
-        estado: '',
+        cliente: "",
+        sucursal: "",
+        estado: "",
         total: 0,
       },
+      searchQuery: "",
     };
   },
   mounted() {
     this.cargarPedidos();
   },
+  computed: {
+    pedidosFiltrados() {
+      if (!this.searchQuery) {
+        return this.pedidos;
+      }
+      return this.pedidos.filter((pedido) =>
+        pedido.cliente
+          .toLowerCase()
+          .includes(this.searchQuery.toLowerCase())
+      );
+    },
+  },
   methods: {
     cargarPedidos() {
-      axios.get('http://localhost:8000/api/pedidos')
-        .then(response => {
+      axios
+        .get("http://localhost:8000/api/pedidos")
+        .then((response) => {
           this.pedidos = response.data;
         })
-        .catch(error => {
-          console.error('Error al cargar pedidos:', error);
+        .catch((error) => {
+          console.error("Error al cargar pedidos:", error);
         });
     },
     abrirModal(modo, pedido = null) {
       this.modo = modo;
-      if (modo === 'editar' && pedido) {
+      if (modo === "editar" && pedido) {
         this.form = { ...pedido };
       } else {
-        this.form = { id: null, cliente: '', sucursal: '', estado: '', total: 0 };
+        this.form = { id: null, cliente: "", sucursal: "", estado: "", total: 0 };
       }
-      this.$refs.modal.style.display = 'block';
+      const modalElement = document.getElementById("pedidoModal");
+      const bootstrapModal = new bootstrap.Modal(modalElement);
+      bootstrapModal.show();
     },
     cerrarModal() {
-      this.$refs.modal.style.display = 'none';
+      const modalElement = document.getElementById("pedidoModal");
+      const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+      bootstrapModal.hide();
     },
     guardarPedido() {
-      if (this.modo === 'crear') {
-        axios.post('http://localhost:8000/api/pedidos', this.form)
+      if (this.modo === "crear") {
+        axios
+          .post("http://localhost:8000/api/pedidos", this.form)
           .then(() => {
             this.cargarPedidos();
             this.cerrarModal();
           })
-          .catch(error => {
-            console.error('Error al guardar pedido:', error);
+          .catch((error) => {
+            console.error("Error al guardar pedido:", error);
           });
       } else {
-        axios.put(`http://localhost:8000/api/pedidos/${this.form.id}`, this.form)
+        axios
+          .put(`http://localhost:8000/api/pedidos/${this.form.id}`, this.form)
           .then(() => {
             this.cargarPedidos();
             this.cerrarModal();
           })
-          .catch(error => {
-            console.error('Error al editar pedido:', error);
+          .catch((error) => {
+            console.error("Error al editar pedido:", error);
           });
       }
     },
     eliminarPedido(id) {
-      if (confirm('¿Estás seguro de eliminar este pedido?')) {
-        axios.delete(`http://localhost:8000/api/pedidos/${id}`)
+      if (confirm("¿Estás seguro de eliminar este pedido?")) {
+        axios
+          .delete(`http://localhost:8000/api/pedidos/${id}`)
           .then(() => {
             this.cargarPedidos();
           })
-          .catch(error => {
-            console.error('Error al eliminar pedido:', error);
+          .catch((error) => {
+            console.error("Error al eliminar pedido:", error);
           });
       }
     },
@@ -152,18 +253,7 @@ export default {
 </script>
 
 <style>
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1050;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.5);
-}
-.modal-dialog {
-  margin: 10% auto;
+.container {
+  max-width: 1000px;
 }
 </style>
